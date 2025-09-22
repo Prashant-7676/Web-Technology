@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Real-Time Clock</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background-color: #f4f4f9;
+        }
+        #time {
+            font-size: 3em;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Real-Time Clock</h1>
+    <div id="time"></div>
+
+    <script>
+        // Function to update the clock
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            // Format time as HH:MM:SS
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            
+            // Update the time on the webpage
+            document.getElementById('time').textContent = timeString;
+        }
+
+        // Call updateTime every 1000 milliseconds (1 second)
+        setInterval(updateTime, 1000);
+
+        // Initial call to display time immediately when the page loads
+        updateTime();
+    </script>
+</body>
+</html>
