@@ -1,0 +1,79 @@
+// A simple Node.js + Express server connected to MySQL showing basic CRUD for a "users" table
+
+const express = require('express');
+const mysql = require('mysql2');
+const bodyParser = require('body-parser');
+
+const app = express();
+app.use(bodyParser.json());
+
+// MySQL connection setup
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'your_mysql_username',
+  password: 'your_mysql_password',
+  database: 'your_database_name'
+});
+
+db.connect(err => {
+  if (err) throw err;
+  console.log('Connected to MySQL database');
+});
+
+// Create users table (run once)
+app.get('/create-table', (req, res) => {
+  const sql = `CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    email VARCHAR(100)
+  )`;
+  db.query(sql, (err) => {
+    if (err) throw err;
+    res.send('Users table created');
+  });
+});
+
+// Create a new user
+app.post('/users', (req, res) => {
+  const { name, email } = req.body;
+  const sql = 'INSERT INTO users (name, email) VALUES (?, ?)';
+  db.query(sql, [name, email], (err, result) => {
+    if (err) throw err;
+    res.json({ message: 'User created', userId: result.insertId });
+  });
+});
+
+// Get all users
+app.get('/users', (req, res) => {
+  db.query('SELECT * FROM users', (err, results) => {
+    if (err) throw err;
+    res.json(results);
+  });
+});
+
+// Get user by ID
+app.get('/users/:id', (req, res) => {
+  db.query('SELECT * FROM users WHERE id = ?', [req.params.id], (err, results) => {
+    if (err) throw err;
+    res.json(results[0] || {});
+  });
+});
+
+// Update user by ID
+app.put('/users/:id', (req, res) => {
+  const { name, email } = req.body;
+  db.query('UPDATE users SET name = ?, email = ? WHERE id = ?', [name, email, req.params.id], (err) => {
+    if (err) throw err;
+    res.json({ message: 'User updated' });
+  });
+});
+
+// Delete user by ID
+app.delete('/users/:id', (req, res) => {
+  db.query('DELETE FROM users WHERE id = ?', [req.params.id], (err) => {
+    if (err) throw err;
+    res.json({ message: 'User deleted' });
+  });
+});
+
+app.listen(3000, () => console.log('Server running on http://localhost:3000'));
